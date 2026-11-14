@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NIDUS · Worklist</title>
+  <link rel="icon" th:href="@{/favicon.svg}" type="image/svg+xml">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="shell">
+  <aside th:replace="~{fragments :: rail(${active})}"></aside>
+  <main class="workspace">
+    <header class="page-head">
+      <div>
+        <p class="kicker">Innovation in stroke identification</p>
+        <h1>Reading room</h1>
+      </div>
+      <p class="chip">NIDUS-demo · NCCT / DWI / CTA</p>
+    </header>
+
+    <p class="banner">
+      A machine-learning diagnostic model using neuroimages, shown as a workstation.
+      Scores in this build are placeholders until a trained model is connected. Do not use them to diagnose or treat anyone.
+    </p>
+
+    <section class="stat-row" aria-label="Worklist summary">
+      <article class="stat stat-lead">
+        <p>Studies</p>
+        <strong th:text="${board.total}">0</strong>
+        <span th:text="${board.scored} + ' scored'">0 scored</span>
+      </article>
+      <article class="stat">
+        <p>Suspected stroke</p>
+        <strong th:text="${board.suspected}">0</strong>
+        <span>Ischemic or hemorrhagic</span>
+      </article>
+      <article class="stat">
+        <p>Awaiting review</p>
+        <strong th:text="${board.queued}">0</strong>
+        <span>Still on the queue</span>
+      </article>
+      <article class="stat">
+        <p>Mean confidence</p>
+        <strong><span th:text="${board.meanConfidence}">0</span><small>%</small></strong>
+        <span>Among scored studies</span>
+      </article>
+    </section>
+
+    <section class="split">
+      <article class="panel">
+        <header class="panel-head">
+          <h2>Latest acquisitions</h2>
+          <a th:href="@{/studies}">Open the full list</a>
+        </header>
+        <div class="table-wrap">
+          <table class="worklist">
+            <thead>
+            <tr>
+              <th>Accession</th>
+              <th>Patient</th>
+              <th>Exam</th>
+              <th>Call</th>
+              <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="study : ${board.recent}">
+              <td><a th:href="@{|/studies/${study.id}|}" th:text="${study.accession}">NID-24011</a></td>
+              <td>
+                <span th:text="${study.patientCode}">P-1842</span>
+                <small th:text="${study.age} + ' · ' + ${study.sex.label}">67 · Male</small>
+              </td>
+              <td>
+                <span th:text="${study.modality.label}">MRI</span>
+                <small th:text="${study.sequenceName}">DWI</small>
+              </td>
+              <td>
+                <span class="pill" th:if="${study.prediction != null}"
+                      th:classappend="${'pill-' + #strings.toLowerCase(study.prediction.name())}"
+                      th:text="${study.prediction.label}">Ischemic stroke</span>
+                <span class="pill" th:if="${study.prediction == null}">Unscored</span>
+              </td>
+              <td th:text="${study.status.label}">Queued</td>
+            </tr>
+            <tr th:if="${board.recent.isEmpty()}">
+              <td colspan="5" class="empty">No studies yet. Register one to start the worklist.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header class="panel-head">
+          <h2>Call mix</h2>
+          <a th:href="@{/model}">Model notes</a>
+        </header>
+        <ul class="mix">
+          <li>
+            <div class="mix-label"><span>Ischemic</span><b th:text="${board.ischemicPct} + '%'">0%</b></div>
+            <div class="bar"><i class="bar-ischemic" th:style="'width:' + ${board.ischemicPct} + '%'"></i></div>
+          </li>
+          <li>
+            <div class="mix-label"><span>Hemorrhagic</span><b th:text="${board.hemorrhagicPct} + '%'">0%</b></div>
+            <div class="bar"><i class="bar-hemorrhagic" th:style="'width:' + ${board.hemorrhagicPct} + '%'"></i></div>
+          </li>
+          <li>
+            <div class="mix-label"><span>No acute stroke</span><b th:text="${board.clearPct} + '%'">0%</b></div>
+            <div class="bar"><i class="bar-clear" th:style="'width:' + ${board.clearPct} + '%'"></i></div>
+          </li>
+        </ul>
+        <p class="panel-note">Shares are of every study on this worklist, including ones still unscored.</p>
+      </article>
+    </section>
+  </main>
+</div>
+</body>
+</html>

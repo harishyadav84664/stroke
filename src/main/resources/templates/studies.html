@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NIDUS · Studies</title>
+  <link rel="icon" th:href="@{/favicon.svg}" type="image/svg+xml">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="shell">
+  <aside th:replace="~{fragments :: rail(${active})}"></aside>
+  <main class="workspace">
+    <header class="page-head">
+      <div>
+        <p class="kicker">Clinical worklist</p>
+        <h1>Studies</h1>
+      </div>
+      <a class="button" th:href="@{/studies/new}">Register a study</a>
+    </header>
+
+    <p class="notice" th:if="${notice}" th:text="${notice}"></p>
+
+    <form class="filters" method="get" th:action="@{/studies}">
+      <label>
+        Search
+        <input type="search" name="q" placeholder="Accession, patient, territory..." th:value="${q}">
+      </label>
+      <label>
+        Call
+        <select name="prediction">
+          <option value="">Any</option>
+          <option th:each="item : ${predictions}"
+                  th:value="${item}"
+                  th:text="${item.label}"
+                  th:selected="${prediction == item}"></option>
+        </select>
+      </label>
+      <label>
+        Status
+        <select name="status">
+          <option value="">Any</option>
+          <option th:each="item : ${statuses}"
+                  th:value="${item}"
+                  th:text="${item.label}"
+                  th:selected="${status == item}"></option>
+        </select>
+      </label>
+      <button type="submit">Filter</button>
+      <a th:href="@{/studies}">Clear</a>
+    </form>
+
+    <div class="table-wrap panel">
+      <table class="worklist">
+        <thead>
+        <tr>
+          <th>Accession</th>
+          <th>Patient</th>
+          <th>Exam</th>
+          <th>Onset</th>
+          <th>NIHSS</th>
+          <th>Call</th>
+          <th>Confidence</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="study : ${studies}">
+          <td><a th:href="@{|/studies/${study.id}|}" th:text="${study.accession}">NID-24011</a></td>
+          <td>
+            <span th:text="${study.patientCode}">P-1842</span>
+            <small th:text="${study.age} + ' · ' + ${study.sex.label}">67 · Male</small>
+          </td>
+          <td>
+            <span th:text="${study.modality.label} + ' ' + ${study.sequenceName}">MRI DWI</span>
+            <small th:text="${#temporals.format(study.acquiredAt, 'dd MMM HH:mm')}">11 Nov 18:00</small>
+          </td>
+          <td th:text="${study.onsetHours} + ' h'">2.5 h</td>
+          <td th:text="${study.nihss}">14</td>
+          <td>
+            <span class="pill" th:if="${study.prediction != null}"
+                  th:classappend="${'pill-' + #strings.toLowerCase(study.prediction.name())}"
+                  th:text="${study.prediction.label}">Ischemic stroke</span>
+            <span class="pill" th:if="${study.prediction == null}">Unscored</span>
+          </td>
+          <td th:text="${study.confidence == null ? '—' : #numbers.formatDecimal(study.confidence * 100, 1, 0) + '%'}">91%</td>
+          <td th:text="${study.status.label}">Queued</td>
+        </tr>
+        <tr th:if="${studies.isEmpty()}">
+          <td colspan="8" class="empty">Nothing matches this filter. Try clearing the filters or registering a study.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>

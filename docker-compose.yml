@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=rootpassword
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/stroke_nidus?createDatabaseIfNotExist=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: stroke_nidus
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/db/create-database.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  mysql_data:

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NIDUS</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="shell">
+  <main class="workspace">
+    <header class="page-head">
+      <div>
+        <p class="kicker">NIDUS</p>
+        <h1 th:text="${status}">404</h1>
+      </div>
+    </header>
+    <p class="banner" th:text="${error}">That page is not on the worklist.</p>
+    <p><a class="button" href="/">Return to the worklist</a></p>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NIDUS · Model</title>
+  <link rel="icon" th:href="@{/favicon.svg}" type="image/svg+xml">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="shell">
+  <aside th:replace="~{fragments :: rail(${active})}"></aside>
+  <main class="workspace">
+    <header class="page-head">
+      <div>
+        <p class="kicker">Methods sheet</p>
+        <h1>The diagnostic model</h1>
+      </div>
+    </header>
+
+    <article class="paper">
+      <p class="kicker">Innovation in stroke identification</p>
+      <h2>A machine learning based diagnostic model using neuroimages</h2>
+      <p class="lede">
+        NIDUS is the reading-room front for that model. It keeps a MySQL worklist of neuroimage studies,
+        shows a call (ischemic, hemorrhagic, or no acute stroke), and leaves the final read with a person.
+      </p>
+
+      <ul class="metric-grid">
+        <li th:each="metric : ${metrics}">
+          <strong th:text="${metric.value}">0.94</strong>
+          <span th:text="${metric.label}">AUC</span>
+          <small th:text="${metric.note}">note</small>
+        </li>
+      </ul>
+
+      <ol class="pipeline">
+        <li th:each="step : ${steps}">
+          <span th:text="${step.index}">01</span>
+          <div>
+            <h3 th:text="${step.title}">Intake</h3>
+            <p th:text="${step.body}">Body</p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="fine">
+        The numbers above are interface placeholders. Swap them for the sensitivity, specificity, and AUC
+        from your own held-out neuroimage evaluation before anyone presents this as a result.
+        This workstation does not train a network and does not read DICOM pixels.
+      </p>
+    </article>
+  </main>
+</div>
+</body>
+</html>

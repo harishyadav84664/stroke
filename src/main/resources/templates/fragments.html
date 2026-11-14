@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="rail(active)" class="rail">
+  <a class="mark" href="/" aria-label="NIDUS home">
+    <span class="gantry-mark" aria-hidden="true"></span>
+    <span class="mark-copy">
+      <strong>NIDUS</strong>
+      <small>Neuroimage stroke model</small>
+    </span>
+  </a>
+  <nav class="rail-nav">
+    <a th:href="@{/}" th:classappend="${active == 'board'} ? 'is-on'">
+      <span>01</span> Worklist
+    </a>
+    <a th:href="@{/studies}" th:classappend="${active == 'studies'} ? 'is-on'">
+      <span>02</span> Studies
+    </a>
+    <a th:href="@{/studies/new}" th:classappend="${active == 'register'} ? 'is-on'">
+      <span>03</span> Register
+    </a>
+    <a th:href="@{/model}" th:classappend="${active == 'model'} ? 'is-on'">
+      <span>04</span> Model
+    </a>
+  </nav>
+  <p class="rail-foot">Research demonstration. Not a medical device, and not for diagnosis.</p>
+</aside>
+</body>
+</html>

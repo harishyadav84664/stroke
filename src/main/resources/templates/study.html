@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="'NIDUS · ' + ${study.accession}">NIDUS · Study</title>
+  <link rel="icon" th:href="@{/favicon.svg}" type="image/svg+xml">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="shell">
+  <aside th:replace="~{fragments :: rail(${active})}"></aside>
+  <main class="workspace">
+    <header class="page-head">
+      <div>
+        <p class="kicker" th:text="${study.patientCode} + ' · ' + ${study.age} + ' · ' + ${study.sex.label}">P-1842 · 67 · Male</p>
+        <h1 th:text="${study.accession}">NID-24011</h1>
+      </div>
+      <a class="text-link" th:href="@{/studies}">Back to studies</a>
+    </header>
+
+    <p class="notice" th:if="${notice}" th:text="${notice}"></p>
+
+    <section class="reader">
+      <div class="viewport"
+           th:classappend="${(study.prediction == null ? 'is-empty' : 'is-' + #strings.toLowerCase(study.prediction.name())) + (study.territory != null and #strings.containsIgnoreCase(study.territory, 'right') ? ' side-right' : ' side-left')}">
+        <svg class="scan" viewBox="0 0 240 260" aria-hidden="true">
+          <circle class="ring" cx="120" cy="118" r="108"/>
+          <circle class="ring inner" cx="120" cy="118" r="96"/>
+          <ellipse class="skull" cx="120" cy="122" rx="68" ry="80"/>
+          <ellipse class="brain" cx="120" cy="126" rx="50" ry="60"/>
+          <path class="fold" d="M86 100c10 8 16 8 24 0M128 96c8 10 16 8 26 2M90 140c12 6 20 4 30-2M130 146c10 8 18 6 24-2"/>
+          <path class="midline" d="M120 72v108"/>
+          <ellipse class="lesion" cx="96" cy="124" rx="18" ry="12"/>
+          <text class="scan-tag" x="18" y="246">AXIAL SCHEMATIC</text>
+        </svg>
+        <p class="viewport-caption">
+          Diagnostic locator schematic. 
+          <span th:if="${study.prediction != null}">Call: <strong th:text="${study.prediction.label}">Ischemic</strong> (<span th:text="${study.territory}">Left MCA</span>).</span>
+        </p>
+      </div>
+
+      <article class="report">
+        <p class="kicker">Model call</p>
+        <h2 th:if="${study.prediction != null}" th:text="${study.prediction.label}">Ischemic stroke</h2>
+        <h2 th:if="${study.prediction == null}">Not scored</h2>
+        <p class="confidence" th:if="${study.confidence != null}">
+          <span th:text="${#numbers.formatDecimal(study.confidence * 100, 1, 0)}">91</span>%
+          <small>confidence</small>
+        </p>
+        <dl class="facts">
+          <div><dt>Exam</dt><dd th:text="${study.modality.label} + ' · ' + ${study.sequenceName}">MRI · DWI</dd></div>
+          <div><dt>Acquired</dt><dd th:text="${#temporals.format(study.acquiredAt, 'dd MMM yyyy HH:mm')}">11 Nov 2026 18:00</dd></div>
+          <div><dt>Onset</dt><dd th:text="${study.onsetHours} + ' hours'">2.5 hours</dd></div>
+          <div><dt>NIHSS</dt><dd th:text="${study.nihss}">14</dd></div>
+          <div><dt>Territory</dt><dd th:text="${study.territory != null ? study.territory : '—'}">Left MCA</dd></div>
+          <div><dt>ASPECTS</dt><dd th:text="${study.aspects != null ? study.aspects : '—'}">6</dd></div>
+          <div><dt>Status</dt><dd th:text="${study.status.label}">Queued</dd></div>
+          <div><dt>Scorer</dt><dd th:text="${study.scoredBy != null ? study.scoredBy : '—'}">NIDUS-v1-Scorer</dd></div>
+        </dl>
+        
+        <p class="kicker" style="margin-top: 16px;">Clinical notes & findings</p>
+        <p class="findings" th:text="${study.findings != null ? study.findings : 'No reader note yet.'}">Note</p>
+        
+        <details style="margin-bottom: 18px; font-size: 13px;">
+          <summary style="cursor: pointer; color: var(--ink); font-weight: 500;">Edit clinical notes</summary>
+          <form method="post" th:action="@{|/studies/${study.id}/findings|}" style="margin-top: 8px;">
+            <textarea name="findings" rows="3" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #cfc6b6; border-radius: 6px; font: inherit;" th:text="${study.findings}" placeholder="Enter clinical impressions..."></textarea>
+            <div style="margin-top: 6px;">
+              <button type="submit" style="font-size: 12px; padding: 6px 12px;">Save notes</button>
+            </div>
+          </form>
+        </details>
+
+        <div class="actions">
+          <form method="post" th:action="@{|/studies/${study.id}/score|}">
+            <button type="submit">Run diagnostic score</button>
+          </form>
+          <form method="post" th:action="@{|/studies/${study.id}/review|}" th:if="${study.status.name() != 'REVIEWED'}">
+            <button class="ghost" type="submit">Mark reviewed</button>
+          </form>
+          <form method="post" th:action="@{|/studies/${study.id}/reopen|}" th:if="${study.status.name() == 'REVIEWED'}">
+            <button class="ghost" type="submit">Reopen for review</button>
+          </form>
+          <form method="post" th:action="@{|/studies/${study.id}/delete|}">
+            <button class="ghost" style="color: #922; border-color: #e5b0b0;" type="submit" onclick="return confirm('Remove this study from the worklist?')">Delete study</button>
+          </form>
+        </div>
+        <p class="fine">The diagnostic scoring engine evaluates NIHSS and modality features for simulated workstation triage. Final diagnosis requires clinical verification by qualified medical personnel.</p>
+      </article>
+    </section>
+  </main>
+</div>
+</body>
+</html>
